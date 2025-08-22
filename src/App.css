@@ -1,0 +1,57 @@
+/* src/App.css */
+.app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #050510;
+  overflow: hidden;
+}
+
+.crystal-wrapper {
+  position: relative;
+  transform-origin: bottom center;
+  animation: spawn 0.2s ease-out forwards;
+}
+
+/* inti cahaya belakang agar fragmen terasa menyatu */
+.core-light {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 260px;
+  height: 640px;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(0,255,255,0.38) 0%, rgba(0,200,255,0.25) 35%, rgba(0,140,255,0.12) 55%, transparent 72%);
+  filter: blur(52px);
+  mix-blend-mode: screen;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.crystal {
+  display: block;
+}
+
+/* setiap fragmen: glow + muncul dari bawah */
+.frag {
+  opacity: 0;
+  filter: url(#glow);
+  mix-blend-mode: screen;          /* menyatu dengan core-light */
+  animation: rise 0.32s ease-out forwards;
+  transform-box: fill-box;         /* biar transform di keyframes pakai bbox */
+}
+
+/* animasi global spawn */
+@keyframes spawn {
+  from { transform: scaleY(0); opacity: 0; }
+  to   { transform: scaleY(1); opacity: 1; }
+}
+
+/* animasi per fragmen */
+@keyframes rise {
+  0%   { transform: translateY(140px) scale(0.92); opacity: 0; }
+  60%  { opacity: 0.8; }
+  100% { transform: translateY(0)     scale(1);    opacity: 1; }
+}
