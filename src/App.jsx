@@ -34,19 +34,15 @@ function genFragments() {
       return [Math.round(cx + xr), Math.round(cy + yr)];
     });
 
-    // warna dalam spektrum biru–cyan, tiap frag beda
+    // warna dalam spektrum biru–cyan (kohesif)
     const hue = 185 + Math.random() * 30;        // 185..215
     const sat = 85 + Math.random() * 10;         // 85..95
     const light = 55 + Math.random() * 20;       // 55..75
     const color = `hsl(${hue} ${sat}% ${light}%)`;
 
-    // delay animasi biar kelihatan naik dari bawah
-    const delay = (i * 0.04).toFixed(2) + "s";
-
     frags.push({
       points: pts.map(p => p.join(",")).join(" "),
       fill: color,
-      delay,
     });
 
     cy += hTotal / N; // geser ke atas
@@ -82,18 +78,17 @@ export default function App() {
           </defs>
 
           {/* aura global tipis */}
-          <g filter="url(#softAura)" opacity="0.25" style={{ mixBlendMode: "screen" }}>
+          <g filter="url(#softAura)" opacity="0.375" style={{ mixBlendMode: "screen" }}>
             <rect x="40" y="60" width="120" height="480" rx="60" fill="#30d6ff" />
           </g>
 
-          {/* fragmen – ukuran, rotasi, warna berbeda-beda */}
+          {/* fragmen – hanya muncul (rise), tanpa gerak masing-masing */}
           {frags.map((f, i) => (
             <polygon
               key={i}
               className="frag"
               points={f.points}
               fill={f.fill}
-              style={{ animationDelay: f.delay }}
             />
           ))}
         </svg>

@@ -11,7 +11,10 @@
 .crystal-wrapper {
   position: relative;
   transform-origin: bottom center;
-  animation: spawn 0.2s ease-out forwards;
+  /* 1) muncul halus, 2) konvoi arah-berurutan (satu kesatuan) */
+  animation:
+    spawn 0.25s ease-out forwards,
+    convoy 12s linear 0.25s infinite;
 }
 
 /* inti cahaya belakang agar fragmen terasa menyatu */
@@ -23,35 +26,67 @@
   height: 640px;
   transform: translate(-50%, -50%);
   background:
-    radial-gradient(ellipse at 50% 50%, rgba(0,255,255,0.38) 0%, rgba(0,200,255,0.25) 35%, rgba(0,140,255,0.12) 55%, transparent 72%);
+    radial-gradient(ellipse at 50% 50%, rgba(0,255,255,0.57) 0%, rgba(0,200,255,0.375) 35%, rgba(0,140,255,0.18) 55%, transparent 72%);
   filter: blur(52px);
   mix-blend-mode: screen;
   z-index: -1;
   pointer-events: none;
 }
 
-.crystal {
-  display: block;
-}
+.crystal { display: block; }
 
-/* setiap fragmen: glow + muncul dari bawah */
+/* setiap fragmen: glow + muncul halus (tanpa gerak sendiri) */
 .frag {
   opacity: 0;
   filter: url(#glow);
-  mix-blend-mode: screen;          /* menyatu dengan core-light */
-  animation: rise 0.32s ease-out forwards;
-  transform-box: fill-box;         /* biar transform di keyframes pakai bbox */
+  mix-blend-mode: screen;
+  transform-box: fill-box;
+  animation: rise 0.38s ease-out forwards;
 }
 
-/* animasi global spawn */
+/* animasi global: scale muncul */
 @keyframes spawn {
   from { transform: scaleY(0); opacity: 0; }
   to   { transform: scaleY(1); opacity: 1; }
 }
 
-/* animasi per fragmen */
+/* muncul lembut untuk fragmen */
 @keyframes rise {
-  0%   { transform: translateY(140px) scale(0.92); opacity: 0; }
-  60%  { opacity: 0.8; }
-  100% { transform: translateY(0)     scale(1);    opacity: 1; }
+  0%   { opacity: 0; filter: blur(6px) brightness(1.05); }
+  60%  { opacity: 0.85; }
+  100% { opacity: 1; filter: blur(0) brightness(1); }
+}
+
+/* === KONVOI ARAH-BERURUTAN (satu kesatuan) ===
+   Segment per 20%:
+   0%→20%:   bawah → atas (center)
+   20% jump, 20%→40%: bawah-kanan → atas-kanan
+   40% jump, 40%→60%: bawah-kiri  → atas-kiri
+   60% jump, 60%→80%: bawah → atas (sedikit offset)
+   80% jump, 80%→100%: kanan → kiri (lintas horizontal halus)
+*/
+@keyframes convoy {
+  /* segmen 1: bawah → atas (center) */
+  0%   { transform: translate(0, 100vh); }
+  20%  { transform: translate(0, -120vh); }
+
+  /* snap ke start segmen 2: bawah-kanan */
+  20.001% { transform: translate(35vw, 100vh); }
+  /* segmen 2: bawah-kanan → atas-kanan */
+  40%  { transform: translate(35vw, -120vh); }
+
+  /* snap ke start segmen 3: bawah-kiri */
+  40.001% { transform: translate(-35vw, 100vh); }
+  /* segmen 3: bawah-kiri → atas-kiri */
+  60%  { transform: translate(-35vw, -120vh); }
+
+  /* snap ke start segmen 4: bawah (sedikit offset kanan) */
+  60.001% { transform: translate(12vw, 100vh); }
+  /* segmen 4: bawah → atas */
+  80%  { transform: translate(12vw, -120vh); }
+
+  /* snap ke start segmen 5: kanan → kiri (horizontal) */
+  80.001% { transform: translate(60vw, 0); }
+  /* segmen 5: kanan → kiri (lewat tengah) */
+  100% { transform: translate(-60vw, 0); }
 }
